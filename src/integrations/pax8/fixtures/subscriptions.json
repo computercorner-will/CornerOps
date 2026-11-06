@@ -1,0 +1,94 @@
+{
+  "subscriptions": [
+    {
+      "id": "demo-pax8-sub-0001",
+      "companyId": "demo-pax8-co-1001",
+      "productName": "Microsoft 365 Business Standard",
+      "sku": "M365-BSTD",
+      "quantity": 15,
+      "unitCostCents": 1250,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0002",
+      "companyId": "demo-pax8-co-1002",
+      "productName": "Microsoft 365 Business Premium",
+      "sku": "M365-BPREM",
+      "quantity": 14,
+      "unitCostCents": 2200,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0003",
+      "companyId": "demo-pax8-co-1003",
+      "productName": "Microsoft 365 Business Premium",
+      "sku": "M365-BPREM",
+      "quantity": 9,
+      "unitCostCents": 2200,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0004",
+      "companyId": "demo-pax8-co-1003",
+      "productName": "Microsoft Defender for Business",
+      "sku": "DEF-BIZ",
+      "quantity": 9,
+      "unitCostCents": 300,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0005",
+      "companyId": "demo-pax8-co-1004",
+      "productName": "Microsoft 365 Business Basic",
+      "sku": "M365-BBASIC",
+      "quantity": 22,
+      "unitCostCents": 600,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0006",
+      "companyId": "demo-pax8-co-1006",
+      "productName": "Microsoft 365 Business Standard",
+      "sku": "M365-BSTD",
+      "quantity": 18,
+      "unitCostCents": 1250,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0007",
+      "companyId": "demo-pax8-co-1007",
+      "productName": "Microsoft 365 Business Premium",
+      "sku": "M365-BPREM",
+      "quantity": 45,
+      "unitCostCents": 2200,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0008",
+      "companyId": "demo-pax8-co-1008",
+      "productName": "Exchange Online (Plan 1)",
+      "sku": "EXO-P1",
+      "quantity": 10,
+      "unitCostCents": 400,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    },
+    {
+      "id": "demo-pax8-sub-0009",
+      "companyId": "demo-pax8-co-1009",
+      "productName": "Microsoft 365 Business Premium",
+      "sku": "M365-BPREM",
+      "quantity": 11,
+      "unitCostCents": 2200,
+      "billingTerm": "Monthly",
+      "status": "Active"
+    }
+  ]
+}

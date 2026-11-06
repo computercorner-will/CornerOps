@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Placeholder values only: CI builds and tests in mock mode and never talks to real services.
+env:
+  DATABASE_URL: postgresql://cornerops:cornerops@localhost:5432/cornerops?schema=public
+  AUTH_SECRET: ci-only-placeholder-secret-not-used-anywhere-else
+  AUTH_MICROSOFT_ENTRA_ID_ID: 00000000-0000-0000-0000-000000000000
+  AUTH_MICROSOFT_ENTRA_ID_SECRET: ci-placeholder
+  AUTH_MICROSOFT_ENTRA_ID_TENANT_ID: 00000000-0000-0000-0000-000000000000
+  ADMIN_EMAILS: admin@example.com
+  INTEGRATIONS_MODE: mock
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Smoke test
+        run: pnpm test:e2e

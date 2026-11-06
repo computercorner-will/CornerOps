@@ -1,0 +1,31 @@
+{
+  "users": [
+    {
+      "id": "demo-user-0001",
+      "displayName": "Pat Example",
+      "userPrincipalName": "pat@acme-anvils.example",
+      "jobTitle": "Office Manager",
+      "department": "Operations",
+      "accountEnabled": true,
+      "assignedLicenseSkus": ["M365-BSTD"]
+    },
+    {
+      "id": "demo-user-0002",
+      "displayName": "Sam Sample",
+      "userPrincipalName": "sam@acme-anvils.example",
+      "jobTitle": "Technician",
+      "department": "Shop",
+      "accountEnabled": true,
+      "assignedLicenseSkus": ["M365-BSTD"]
+    },
+    {
+      "id": "demo-user-0003",
+      "displayName": "Former Employee (Demo)",
+      "userPrincipalName": "former@acme-anvils.example",
+      "jobTitle": null,
+      "department": null,
+      "accountEnabled": false,
+      "assignedLicenseSkus": []
+    }
+  ]
+}

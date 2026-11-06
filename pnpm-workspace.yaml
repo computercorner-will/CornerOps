@@ -1,0 +1,8 @@
+# Single-package repo. This file only exists to allow-list dependency build scripts
+# (pnpm 10+ blocks install scripts unless they are listed here).
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver

@@ -1,0 +1,227 @@
+// CornerOps data model.
+// Conventions: money is stored as integer cents; all timestamps are UTC (timestamptz).
+// SECURITY: never add fields for client passwords, admin credentials, MFA secrets or recovery keys.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  TECH
+  READONLY
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BillingSource {
+  SYNCRO
+  MANUAL
+}
+
+enum BillingFrequency {
+  MONTHLY
+  ANNUAL
+}
+
+enum LicenseSource {
+  PAX8
+}
+
+enum IssueType {
+  LICENSE_QTY_MISMATCH
+  UNBILLED_LICENSE
+  BELOW_PRICE_FLOOR
+  NO_BILLING
+}
+
+enum IssueStatus {
+  OPEN
+  RESOLVED
+  IGNORED
+}
+
+enum SyncSource {
+  SYNCRO
+  PAX8
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+enum ProspectPriority {
+  A
+  B
+  C
+}
+
+enum ProspectStatus {
+  NOT_CONTACTED
+  RESEARCHING
+  CONTACTED
+  MEETING_SET
+  ASSESSMENT_DONE
+  PROPOSAL_SENT
+  WON
+  LOST
+  NOT_A_FIT
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(READONLY)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  resolvedIssues ReconciliationIssue[]
+  auditLogs      AuditLog[]
+}
+
+model Client {
+  id               String       @id @default(cuid())
+  name             String
+  industry         String?
+  status           ClientStatus @default(ACTIVE)
+  syncroCustomerId String?      @unique
+  pax8CompanyId    String?      @unique
+  notes            String?
+  createdAt        DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime     @updatedAt @db.Timestamptz(3)
+
+  billingLines BillingLine[]
+  licenses     LicenseSubscription[]
+  devices      Device[]
+  issues       ReconciliationIssue[]
+}
+
+model BillingLine {
+  id             String           @id @default(cuid())
+  clientId       String
+  client         Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  description    String
+  // Optional product SKU used to match Pax8 subscriptions. Falls back to SkuMapping.
+  sku            String?
+  source         BillingSource
+  frequency      BillingFrequency
+  quantity       Int
+  unitPriceCents Int
+  amountCents    Int
+  externalId     String?          @unique
+  updatedAt      DateTime         @updatedAt @db.Timestamptz(3)
+
+  @@index([clientId])
+}
+
+model LicenseSubscription {
+  id            String        @id @default(cuid())
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  source        LicenseSource @default(PAX8)
+  productName   String
+  sku           String
+  quantity      Int
+  unitCostCents Int
+  billingTerm   String
+  externalId    String        @unique
+  updatedAt     DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@index([clientId])
+}
+
+// Manual fallback for matching a Pax8 SKU to billing lines whose SKU is not set.
+// A billing line matches when its description equals billingDescription (case-insensitive).
+model SkuMapping {
+  id                 String   @id @default(cuid())
+  pax8Sku            String   @unique
+  billingDescription String
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model Device {
+  id            String    @id @default(cuid())
+  clientId      String
+  client        Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  syncroAssetId String    @unique
+  name          String
+  deviceType    String?
+  lastSeenAt    DateTime? @db.Timestamptz(3)
+
+  @@index([clientId])
+}
+
+model ReconciliationIssue {
+  id           String      @id @default(cuid())
+  clientId     String
+  client       Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type         IssueType
+  // Stable identity of the finding within a client (e.g. "sku:CFQ7TTC0LH18"), so that
+  // rerunning reconciliation updates the existing open issue instead of duplicating it.
+  key          String
+  details      Json
+  status       IssueStatus @default(OPEN)
+  note         String?
+  resolvedById String?
+  resolvedBy   User?       @relation(fields: [resolvedById], references: [id])
+  resolvedAt   DateTime?   @db.Timestamptz(3)
+  createdAt    DateTime    @default(now()) @db.Timestamptz(3)
+
+  @@index([clientId, type, key, status])
+  @@index([status])
+}
+
+model SyncRun {
+  id          String     @id @default(cuid())
+  source      SyncSource
+  startedAt   DateTime   @default(now()) @db.Timestamptz(3)
+  finishedAt  DateTime?  @db.Timestamptz(3)
+  status      SyncStatus @default(RUNNING)
+  recordsRead Int        @default(0)
+  error       String?
+
+  @@index([startedAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  // Null for system jobs (e.g. `pnpm sync` from the command line).
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model Prospect {
+  id            String           @id @default(cuid())
+  company       String
+  segment       String?
+  area          String?
+  phone         String?
+  website       String?
+  priority      ProspectPriority @default(C)
+  status        ProspectStatus   @default(NOT_CONTACTED)
+  owner         String?
+  lastContactAt DateTime?        @db.Timestamptz(3)
+  nextStep      String?
+  notes         String?
+  createdAt     DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime         @updatedAt @db.Timestamptz(3)
+}

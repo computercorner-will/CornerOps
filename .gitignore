@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# production
+build/
+dist/
+
+# prisma generated client
+src/generated/
+
+# env files (only the example is committed)
+.env*
+!.env.example
+
+# testing
+coverage/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# misc
+.DS_Store
+*.pem
+*.log
+*.tsbuildinfo
+.vscode/
+.idea/
